@@ -49,7 +49,10 @@ export const Home = () => {
           <span>0</span>
         </CountdownContainer>
 
-        <StartCountDownButton type="submit">
+        <StartCountDownButton
+          type="submit"
+          disabled
+        >
           <Play size={24} />
           Começar
         </StartCountDownButton>

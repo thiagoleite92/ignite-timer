@@ -17,6 +17,7 @@ export const GlobalStyle = createGlobalStyle`
       backgroundColor: theme['gray-900'],
       color: theme['gray-300'],
     })}
+    -webkit-font-smoothing: antialiased;
   }
 
   body, input, textarea, button {

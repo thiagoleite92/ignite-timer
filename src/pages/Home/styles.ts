@@ -85,11 +85,13 @@ export const Separator = styled.div`
   justify-content: center;
 `
 
-export const StartCountDownButton = styled.button`
+const BaseCountDownButton = styled.button`
   width: 100%;
   border: 0;
   padding: 1rem;
   border-radius: 8px;
+
+  color: ${({ theme }) => theme['gray-100']};
 
   display: flex;
   align-items: center;
@@ -99,15 +101,26 @@ export const StartCountDownButton = styled.button`
 
   cursor: pointer;
 
+  &:disabled {
+    cursor: 'not-allowed';
+    opacity: 0.7;
+  }
+`
+
+export const StartCountDownButton = styled(BaseCountDownButton)`
   ${({ theme }) => ({
     backgroundColor: theme['green-500'],
-    color: theme['gray-100'],
     '&:not(:disabled):hover': {
       backgroundColor: theme['green-700'],
     },
-    '&:disabled': {
-      cursor: 'not-allowed',
-      opacity: 0.7,
+  })}
+`
+export const StopCountDownButton = styled(BaseCountDownButton)`
+  ${({ theme }) => ({
+    backgroundColor: theme['red-500'],
+
+    '&:not(:disabled):hover': {
+      backgroundColor: theme['red-700'],
     },
   })}
 `

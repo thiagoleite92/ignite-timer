@@ -19,6 +19,7 @@ interface CyclesState {
 export const cyclesReducer = (state: CyclesState, action: any) => {
   switch (action.type) {
     case ActionTypes.ADD_NEW_CYCLE:
+      console.log(action.payload)
       return produce(state, (draft) => {
         draft.cycles.push(action.payload.newCycle)
         draft.activeCycleId = action.payload.newCycle.id

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState } from 'react'
+import { ReactNode, createContext, useReducer, useState } from 'react'
 
 interface CreateCycleData {
   task: string
@@ -31,25 +31,66 @@ interface CyclesContextProviderProps {
   children: ReactNode
 }
 
+interface CyclesState {
+  cycles: Array<Cycle>
+  activeCycleId: string | null
+}
+
 export const CyclesContextProvider = ({
   children,
 }: CyclesContextProviderProps) => {
-  const [cycles, setCycles] = useState<Array<Cycle>>([])
-  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [cyclesState, dispatch] = useReducer(
+    (state: CyclesState, action: any) => {
+      switch (action.type) {
+        case 'ADD_NEW_CYCLE':
+          return {
+            ...state,
+            cycles: [...state.cycles, action.payload.newCycle],
+            activeCycleId: action.payload.newCycle.id,
+          }
+        case 'INTERRUPT_CURRENT_CYCLE':
+          return {
+            ...state,
+            cycles: state.cycles.map((cycle) => {
+              if (cycle.id === state.activeCycleId) {
+                return { ...cycle, interrupteDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+            activeCycleId: null,
+          }
+        case 'MARK_CURRENT_CYCLE_AS_FINISHED':
+          return {
+            ...state,
+            cycles: state.cycles.map((cycle) => {
+              if (cycle.id === state.activeCycleId) {
+                return { ...cycle, finishedDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+            activeCycleId: null,
+          }
+        default:
+          return state
+      }
+    },
+    { cycles: [], activeCycleId: null },
+  )
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+  const { cycles, activeCycleId } = cyclesState
 
   const activeCycle = cycles.find(({ id }) => id === activeCycleId)
 
   const markCurrentCycleAsFinished = () => {
-    setCycles((oldState) =>
-      oldState.map((cycle) => {
-        if (cycle.id === activeCycleId) {
-          return { ...cycle, interrupteDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
-    )
+    dispatch({
+      type: 'MARK_CURRENT_CYCLE_AS_FINISHED',
+      payload: {
+        activeCycleId,
+      },
+    })
   }
 
   const setSecondsPassed = (seconds: number) => {
@@ -66,25 +107,23 @@ export const CyclesContextProvider = ({
       startDate: new Date(),
     }
 
-    setCycles((oldState) => [...oldState, newCycle])
-    setActiveCycleId(id)
-    setAmountSecondsPassed(0)
+    dispatch({
+      type: 'ADD_NEW_CYCLE',
+      payload: {
+        newCycle,
+      },
+    })
 
-    // reset()
+    setAmountSecondsPassed(0)
   }
 
   const interruptCurrentCycle = () => {
-    setCycles((oldState) =>
-      oldState.map((cycle) => {
-        if (cycle.id === activeCycleId) {
-          return { ...cycle, interrupteDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
-    )
-
-    setActiveCycleId(null)
+    dispatch({
+      type: 'INTERRUPT_CURRENT_CYCLE',
+      payload: {
+        activeCycleId: null,
+      },
+    })
 
     document.title = 'Pomodoro Ignite'
   }

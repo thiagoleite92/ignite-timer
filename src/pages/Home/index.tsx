@@ -38,6 +38,7 @@ export const Home = () => {
   const { watch, reset, handleSubmit } = newCycleForm
 
   const handleCreateNewCycle = (data: NewCycleFormData) => {
+    console.log('oi')
     createNewCycle(data)
     reset()
   }
